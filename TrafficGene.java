@@ -26,15 +26,14 @@ public class TrafficGene extends JFrame implements  ActionListener {
       setTitle("Traffic Generator");  
       setSize(700, 100);   
  
-
       lbltran = new JLabel("Transmission:");
       String[] TransType = {"TCP", "UDP"};
       tr = new JComboBox(TransType);
-      //tr.setSelectedItem(0);
+      tr.setSelectedItem(0);
       selectedtr = (String)tr.getSelectedItem();
+      tr.addActionListener(this);
       add(lbltran);
       add(tr);
-
 
       lblPort = new JLabel("Port:");
       tfPort= new JTextField("",10); 
@@ -46,6 +45,7 @@ public class TrafficGene extends JFrame implements  ActionListener {
       tfSize = new JTextField("",10); 
       ps = new JComboBox(PacSize);
       selectedps = (String)ps.getSelectedItem();
+      ps.addActionListener(this);
       add(lblSize);
       add(tfSize);
       add(ps);
@@ -74,17 +74,46 @@ public class TrafficGene extends JFrame implements  ActionListener {
    {
       StringBuilder inputs = new StringBuilder();
       String info;
-   //   BufferedReader stdInput = new BufferedReader(
-   //         new InputStreamReader(info.getInputStream()));
-
-   //   Writer file = new BufferedWriter(new OutputStreamWriter(
-   //         new FileOutputStream("JsonFormat.txt"), "utf-8")); 
-
       String ttype = "";
       String prtnm = "";
       String psize = "";
 
-   //try
+  
+      if (ev.getSource() == tr)
+      {
+      //   JComboBox cb = (JComboBox) ev.getSource();
+      //   String type = (String)cb.getSelectedItem();
+         selectedtr = (String)tr.getSelectedItem();
+         switch (selectedtr)
+         {
+            case "UDP":
+            selectedtr = "UDP";
+               break;
+         
+            default: selectedtr = "TCP";
+               break;
+         }
+      }
+
+      if (ev.getSource() == ps)
+      {
+         selectedps = (String)ps.getSelectedItem();
+         switch (selectedps)
+         {
+            case "Kb":
+            selectedps = "Kb";
+               break;
+            case "Mb":
+            selectedps = "Mb";
+               break;
+            case "Gb":
+            selectedps = "Gb";
+               break;
+            default: selectedps = "B";
+               break;
+         }
+      }
+
          try 
          {
             ttype= "Transmission: " + selectedtr;
@@ -99,14 +128,9 @@ public class TrafficGene extends JFrame implements  ActionListener {
             fileWriter.write(info);
             fileWriter.flush();
             fileWriter.close();
-
-   //         while ((info = stdInput.readLine()) != null)
-   //            { 
-   //              System.out.println(info);  
-   //              file.write(info+"\n");  
-   //           }
+   
    //         System.out.println(inputs);
-   //         file.close(); 
+
          } 
          catch (Exception e) 
          {
