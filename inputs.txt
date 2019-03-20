@@ -1,0 +1,1 @@
+{Transmission: UDP, Port: 20, Packet Size: 2048B}
