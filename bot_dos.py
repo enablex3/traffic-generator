@@ -1,6 +1,6 @@
 import socket
 
-host = "192.168.126.128"
+host = "192.168.3.130"
 port = 20
 buffer_size = 2048
 transmission = "UDP"

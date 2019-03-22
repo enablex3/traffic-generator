@@ -10,9 +10,6 @@ def generate_dos(bot, username, password, script):
         ssh.connect(hostname=bot, username=username, password=password)
         stdin, stdout, stderr = ssh.exec_command("python {}".format(script))
 
-        print(stderr.read())
-        print(stdout.read())
-
         return("break")
 
 def transfer_script(host, username, password, script):
