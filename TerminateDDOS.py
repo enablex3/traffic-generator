@@ -60,11 +60,13 @@ def terminate_bot_dos(bot, username, password):
 
 bot1 = "192.168.3.131"
 bot2 = "192.168.3.130"
-
+bot3 = "192.168.3.135"
+user3 = "osboxes"
+password3 = "osboxes.org"
 username = "root"
 password = "root"
 
-botnet = { bot1: [username, password], bot2: [username, password] }
+botnet = { bot1: [username, password], bot2: [username, password], bot3: [user3, password3] }
 
 for bot, bot_credentials in botnet.items():
     username = bot_credentials[0]
