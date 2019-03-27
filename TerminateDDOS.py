@@ -1,5 +1,7 @@
 # will need to pull bot info from Inputs
+# user will need to be sure python is installed on each bot
 # BE SURE TO INCLUDE WORKAROUND IN README IF THIS FAILS !!!
+# MAY BE ABLE TO INCLUDE WINDOWS MACHINE AS BOT AND KILL VIA - "tasklist | find /I 'python' => taskkill /F /PID <pid>"
 from paramiko import SSHClient
 import paramiko, sys
 
