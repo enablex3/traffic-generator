@@ -1,79 +1,92 @@
-# will need to pull bot info from Inputs
 # user will need to be sure python is installed on each bot
 # BE SURE TO INCLUDE WORKAROUND IN README IF THIS FAILS !!!
-# MAY BE ABLE TO INCLUDE WINDOWS MACHINE AS BOT AND KILL VIA - "tasklist | find /I 'python' => taskkill /F /PID <pid>"
 from paramiko import SSHClient
-import paramiko, sys
+from Inputs import get_bot_info
+import paramiko, sys, getpass
 
 def terminate_bot_dos(bot, username, password):
-        # obtain the process ID of the bot_dos.py execution first
-        ssh = SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        # ssh.load_system_host_keys()
-        
-        command = "ps -ef | grep bot_dos.py"
-        ssh.connect(hostname=bot, username=username, password=password)
-        stdin, stdout, stderr = ssh.exec_command(command)
-        
-        output = stdout.read()
-        output = output.decode()
-        error = stderr.read()
-        error = error.decode()
+    # obtain the process ID of the bot_dos.py execution first
+    ssh = SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    # ssh.load_system_host_keys()
+    command = "ps -ef | grep bot_dos.py"
+    ssh.connect(hostname=bot, username=username, password=password)
+    stdin, stdout, stderr = ssh.exec_command(command)
+    
+    output = stdout.read()
+    output = output.decode()
+    error = stderr.read()
+    error = error.decode()
 
-        output = output.split('\n')
+    output = output.split('\n')
+    try:
+        dos_process = [process for process in output if "python bot_dos.py" in process]
+        dos_process = dos_process[0]
+        dos_process = dos_process.split(" ")
+    except Exception as error:
+        verification = str(error) + "\n"
+        sys.stderr.write(verification)
+        sys.stderr.flush()
+
+    evaluate = []
+
+    for element in dos_process:
         try:
-            dos_process = [process for process in output if "python bot_dos.py" in process]
-            dos_process = dos_process[0]
-            dos_process = dos_process.split(" ")
+            element = int(element)
+            evaluate.append(element)
         except Exception as error:
-            verification = str(error)
-            print(verification)
-            sys.exit(1)
+            pass
 
-        evaluate = []
+    dos_pid = max(evaluate)
 
-        for element in dos_process:
-            try:
-                element = int(element)
-                evaluate.append(element)
-            except Exception as error:
-                pass
+    # kill the process via its PID
+    command = "kill -9 {}".format(str(dos_pid))
+    stdin, stdout, stderr = ssh.exec_command(command)
 
-        dos_pid = max(evaluate)
+    # verify the command executed successfully
+    command = "ps -ef | grep bot_dos.py"
+    ssh.connect(hostname=bot, username=username, password=password)
+    stdin, stdout, stderr = ssh.exec_command(command)
 
-        # kill the process via its PID
-        command = "kill -9 {}".format(str(dos_pid))
-        stdin, stdout, stderr = ssh.exec_command(command)
+    output = stdout.read()
+    output = output.decode()
 
-        # verify the command executed successfully
-        command = "ps -ef | grep bot_dos.py"
-        ssh.connect(hostname=bot, username=username, password=password)
-        stdin, stdout, stderr = ssh.exec_command(command)
+    if not "python bot_dos.py" in output:
+        verification = "Process terminated on bot: {}.\n".format(bot)
+        sys.stdout.write(verification)
+        sys.stdout.flush()
+    else:
+        verification = "Process has not been terminated on bot: {}.\n".format(bot)
+        sys.stderr.write(verification)
+        sys.stderr.flush()
 
-        output = stdout.read()
-        output = output.decode()
+    return("break")
 
-        if not "python bot_dos.py" in output:
-            verification = "Process terminated on bot: {}.".format(bot)
-        else:
-            verification = "Process has not been terminated on bot: {}.".format(bot)
+username = getpass.getuser()
 
-        return(verification)
+filename = "C:\\Users\\{}\\eclipse-workspace\\traffic-gen\\botnet.txt".format(username)
+bot_data = get_bot_info(filename)
 
-bot1 = "192.168.3.131"
-bot2 = "192.168.3.130"
-bot3 = "192.168.3.135"
-user3 = "osboxes"
-password3 = "osboxes.org"
-username = "root"
-password = "root"
+botnet = {}
+for bot in bot_data:
+    bot = bot.rstrip()
+    bot = bot.replace(" ", "")
 
-botnet = { bot1: [username, password], bot2: [username, password], bot3: [user3, password3] }
+    split_data = bot.split(",")
+
+    botnet[split_data[0]] = [] 
+    botnet[split_data[0]].append(split_data[1])
+    botnet[split_data[0]].append(split_data[2])
 
 for bot, bot_credentials in botnet.items():
     username = bot_credentials[0]
     password = bot_credentials[1]
-    
-    verification = terminate_bot_dos(bot, username, password)
 
-    print(verification)
+    try:
+        terminate_bot_dos(bot, username, password)
+    except Exception as error:
+        verification = "Nothing to do on: {}\n".format(bot)
+        sys.stderr.write(verification)
+        sys.stderr.flush()
+
+sys.exit(0)

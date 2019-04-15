@@ -9,4 +9,11 @@ def get_inputs(filename):
 
     return(inputs)
 
+def get_bot_info(filename):
+	with open(filename, 'r') as readBotFile:
+		data = readBotFile.readlines()
+
+	return(data)
+
+
 
