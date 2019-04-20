@@ -258,6 +258,7 @@ public class TrafficGene extends JFrame implements ActionListener {
         {
           try
             { 
+              btnStop.setEnabled(true);   
               InputStream stderr = null;
               InputStream stdout = null;
 ///****************************THE WHOLE PATH IS NEEDED********************************
