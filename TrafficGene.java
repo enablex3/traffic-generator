@@ -40,7 +40,7 @@ public class TrafficGene extends JFrame implements ActionListener {
   JTextField tfTrgt5;
 
   JTextArea sout = new JTextArea(20, 50);
-
+  JScrollPane scrollPane;
   String selectedtr;
   String selectedbs;
   String selectedos;
@@ -56,8 +56,9 @@ public class TrafficGene extends JFrame implements ActionListener {
 
    public TrafficGene () {
       setLayout(new FlowLayout());
-      setTitle("Traffic Generator");  
-      setSize(420, 600);   
+      setTitle("Traffic Generator");
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  
+      setSize(720, 620);   
 
       lbltran = new JLabel("Transmission:");
       String[] TransType = {"TCP", "UDP", "ICMP"};
@@ -104,7 +105,6 @@ public class TrafficGene extends JFrame implements ActionListener {
       pnl.add(tfTrgt4);
       pnl.add(tfTrgt5);
 
-
       String[] DOS = {"NONE", "SINGLE", "DISTRIBUTED"};
       dos = new JComboBox(DOS);
       dos.setSelectedItem(0);
@@ -122,16 +122,16 @@ public class TrafficGene extends JFrame implements ActionListener {
       lh.setEnabled(false);
 
       sout.setForeground(Color.blue);
-      JScrollPane scrollPane = new JScrollPane(sout, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-      add(scrollPane);
-      sout.setPreferredSize(new Dimension(20, 50));
+      scrollPane = new JScrollPane(sout, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+      add(sp); 
+      sp.add(scrollPane);
       sout.setText("Stdout:");
-      //add(sout);
+      sout.setLineWrap(true);
+      sout.setEditable(false);
 
       pn.setLayout(new GridLayout(3,1));
       add(pn);
       btnStart = new JButton("Start");  
-   // btnStart.setBounds(100,100,140, 40); 
       pn.add(btnStart); 
       btnStart.addActionListener(this);
       pn.add(btnGO);   
@@ -400,7 +400,7 @@ public class TrafficGene extends JFrame implements ActionListener {
             //System.out.println(bot);
             //System.out.println("Count is "+count);
          }
-     
+
             lc= "\"Localhost?\": " + "\"" + lch+ "\""; 
 
             inputs.append("{"+ ttype+ ", " + prtnm + ", " + bsize + ", "+ trgts + ", "+ dos_ +", "+ lc + "}");
