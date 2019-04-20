@@ -53,6 +53,7 @@ public class TrafficGene extends JFrame implements ActionListener {
   JButton btnStart;
   JButton btnGO = new JButton("GO");  
   JButton btnStop = new JButton("Stop");  
+  JButton btnARP = new JButton("ARP Scan");  
 
    public TrafficGene () {
       setLayout(new FlowLayout());
@@ -121,15 +122,7 @@ public class TrafficGene extends JFrame implements ActionListener {
       pnl.add(lh);
       lh.setEnabled(false);
 
-      sout.setForeground(Color.blue);
-      scrollPane = new JScrollPane(sout, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-      add(sp); 
-      sp.add(scrollPane);
-      sout.setText("Stdout:");
-      sout.setLineWrap(true);
-      sout.setEditable(false);
-
-      pn.setLayout(new GridLayout(3,1));
+      pn.setLayout(new GridLayout(1,4));
       add(pn);
       btnStart = new JButton("Start");  
       pn.add(btnStart); 
@@ -137,11 +130,18 @@ public class TrafficGene extends JFrame implements ActionListener {
       pn.add(btnGO);   
       btnGO.addActionListener(this);   
       pn.add(btnStop); 
-      btnStop.setEnabled(false);      
-      // inspecting the container/components objects
-      // System.out.println(this);
-      // System.out.println(lblSize);
-      // System.out.println(tfSize);
+      btnStop.setEnabled(false);  
+      pn.add(btnARP); 
+      btnARP.addActionListener(this);
+
+      sout.setForeground(Color.blue);
+      scrollPane = new JScrollPane(sout, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+      add(sp); 
+      sp.add(scrollPane);
+      sout.setText("Stdout:");
+      sout.setLineWrap(true);
+      sout.setEditable(false); 
+
       setVisible(true);      
    }
 
@@ -255,73 +255,105 @@ public class TrafficGene extends JFrame implements ActionListener {
       }
 
       if (ev.getSource()== btnGO)
-      {
-         try
-         { 
-           InputStream stderr = null;
-           InputStream stdout = null;
+        {
+          try
+            { 
+              InputStream stderr = null;
+              InputStream stdout = null;
 ///****************************THE WHOLE PATH IS NEEDED********************************
 ///********************************///********************************
-           String command = "python C:\\Users\\User\\Desktop\\traffic-generator\\TrafficGenerator.py"; ////
-           Runtime r  = Runtime.getRuntime(); 
-           Process proc = r.exec(command);
-           stderr = proc.getErrorStream ();
-           stdout = proc.getInputStream ();
-           int k;
-              while((k = stderr.read()) != -1)
-              {
+              String command = "python C:\\Users\\User\\Desktop\\traffic-generator\\TrafficGenerator.py"; ////
+              Runtime r  = Runtime.getRuntime(); 
+              Process proc = r.exec(command);
+              stderr = proc.getErrorStream ();
+              stdout = proc.getInputStream ();
+              int k;
+               while((k = stderr.read()) != -1)
+               {
          	     char e = (char)k;
          	     System.out.print(e);
          	     sout.append(String.valueOf(e));
-              }
-           int i;
+               }
+             int i;
               while ((i = stdout.read()) != -1 )
-              { 
+               { 
                  char c = (char)i;
                  System.out.print(c);
                  sout.append(String.valueOf(c));
-              }
-         }
-       catch (IOException e) 
-         { 
+               }
+           }
+          catch (IOException e) 
+           { 
            e.printStackTrace(); 
-         }
-      }
+           }
+        }
 
       if (ev.getSource()== btnStop)
-      {
-         try
-         {
-        	 InputStream stderr = null;
-        	 InputStream stdout = null;
-        	 String command = "python C:\\Users\\User\\Desktop\\traffic-generator\\TerminateDDOS.py";
-        	 Runtime r = Runtime.getRuntime();
-        	 Process proc = r.exec(command);
-        	 stderr = proc.getErrorStream();
-        	 stdout = proc.getInputStream();
+        {
+          try
+           {
+        	    InputStream stderr = null;
+        	    InputStream stdout = null;
+        	    String command = "python C:\\Users\\User\\Desktop\\traffic-generator\\TerminateDDOS.py";
+        	    Runtime r = Runtime.getRuntime();
+        	    Process proc = r.exec(command);
+        	    stderr = proc.getErrorStream();
+        	    stdout = proc.getInputStream();
              int k;
-                while((k = stderr.read()) != -1)
+              while((k = stderr.read()) != -1)
                 {
            	     char e = (char)k;
            	     System.out.print(e);
            	     sout.append(String.valueOf(e));
                 }
-        	 int i;
-        	    while ((i = stdout.read()) != -1)
-        	    {
-        	    	char c = (char)i;
-        	    	System.out.print(c);
-        	    	sout.append(String.valueOf(c));
-        	    }
+        	    int i;
+        	     while ((i = stdout.read()) != -1)
+        	       {
+        	    	  char c = (char)i;
+        	    	  System.out.print(c);
+        	    	  sout.append(String.valueOf(c));
+        	       }
           }
           catch (IOException e)
-          {
-        	  e.printStackTrace();
+           {
+        	    e.printStackTrace();
+           }
+        }
+
+      if (ev.getSource()== btnARP)
+        {
+          try
+           {
+             InputStream stderr = null;
+             InputStream stdout = null;
+             String command = "python C:\\Users\\User\\Desktop\\traffic-generator\\arp.py";
+             Runtime r = Runtime.getRuntime();
+             Process proc = r.exec(command);
+             stderr = proc.getErrorStream();
+             stdout = proc.getInputStream();
+             int k;
+              while((k = stderr.read()) != -1)
+              {
+                 char e = (char)k;
+                 System.out.print(e);
+                 sout.append(String.valueOf(e));
+              }
+             int i;
+              while ((i = stdout.read()) != -1)
+                {
+                  char c = (char)i;
+                  System.out.print(c);
+                  sout.append(String.valueOf(c));
+                }
           }
-         }
+          catch (IOException e)
+            {
+             e.printStackTrace();
+            }  
+        }
 
       if (ev.getSource()== btnStart)
-      {
+        {
          if ( (selectedbs == "KB" && Integer.parseInt(tfSize.getText()) > 64) || (selectedbs == "B" && Integer.parseInt(tfSize.getText()) > 64000) || Integer.parseInt(tfSize.getText()) <= 0)
           JOptionPane.showMessageDialog (null, "More than 64 is not allowed", "Error", JOptionPane.ERROR_MESSAGE);
 
