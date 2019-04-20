@@ -23,6 +23,7 @@ public class TrafficGene extends JFrame implements ActionListener {
   JComboBox tr;
   JComboBox bs;
   JComboBox dos;
+  JComboBox lh;
 
   JTextField tfPort1 = new JTextField("",6); 
   JTextField tfPort2 = new JTextField("",6);
@@ -45,16 +46,13 @@ public class TrafficGene extends JFrame implements ActionListener {
   String selectedos;
   String[] tempsArray;
   String bots[][]=new String[10][4];
-  String lch="\"No\"";
+  String lch;
 
   ButtonGroup group = new ButtonGroup();
 
   JButton btnStart;
   JButton btnGO = new JButton("GO");  
   JButton btnStop = new JButton("Stop");  
-
-  JRadioButton YES = new JRadioButton("YES");
-  JRadioButton NO = new JRadioButton("NO");
 
    public TrafficGene () {
       setLayout(new FlowLayout());
@@ -116,20 +114,19 @@ public class TrafficGene extends JFrame implements ActionListener {
       p.add(dos);
 
       lblhost = new JLabel("Include LocalHost?:");
-      YES.setActionCommand("Yes");
-      NO.setActionCommand("No");
-      YES.setSelected(true);
-      group.add(YES);
-      group.add(NO);
-      //setLayout(new FlowLayout());
+      String[] lhost = {"No", "Yes"};
+      lh = new JComboBox(lhost);
+      lch = (String)lh.getSelectedItem();
       pnl.add(lblhost);
-      pnl.add(YES);
-      pnl.add(NO);
+      pnl.add(lh);
+      lh.setEnabled(false);
 
       sout.setForeground(Color.blue);
+      JScrollPane scrollPane = new JScrollPane(sout, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+      add(scrollPane);
       sout.setPreferredSize(new Dimension(20, 50));
       sout.setText("Stdout:");
-      add(sout);
+      //add(sout);
 
       pn.setLayout(new GridLayout(3,1));
       add(pn);
@@ -186,6 +183,19 @@ public class TrafficGene extends JFrame implements ActionListener {
          }
       }
 
+      if (ev.getSource() == lh)
+      {
+       lch = (String)lh.getSelectedItem();
+       switch (lch)
+         {
+          case "Yes":
+          lch = "Yes";
+             break;
+          default: lch = "No";
+             break;                     
+         }
+      }
+
       if (ev.getSource() == bs)
       {
          selectedbs = (String)bs.getSelectedItem();
@@ -212,25 +222,9 @@ public class TrafficGene extends JFrame implements ActionListener {
             case "DISTRIBUTED":
             selectedos = "DISTRIBUTED";
             btnStop.setEnabled(true);   
-            btnStop.addActionListener(this); 
-            YES.addActionListener(this);  
-            NO.addActionListener(this);   
-            if (ev.getActionCommand().equals("Start"))
-            {
-               System.out.println("Selected Radio Button: " + group.getSelection().getActionCommand());
-           }
-            if (ev.getSource() == YES)
-            {
-               if (YES.isSelected() == true)
-             { 
-               lch = "\"Yes\""; 
-             } 
-            }
-           //else if (NO.isSelected())
-           if (ev.getSource() == NO)
-            { 
-               lch = "\"No\""; 
-            } 
+            btnStop.addActionListener(this);
+            lh.setEnabled(true);
+            lh.addActionListener(this);
 
          try
          {   
@@ -266,7 +260,6 @@ public class TrafficGene extends JFrame implements ActionListener {
          { 
            InputStream stderr = null;
            InputStream stdout = null;
-
 ///****************************THE WHOLE PATH IS NEEDED********************************
 ///********************************///********************************
            String command = "python C:\\Users\\User\\Desktop\\traffic-generator\\TrafficGenerator.py"; ////
@@ -301,7 +294,6 @@ public class TrafficGene extends JFrame implements ActionListener {
          {
         	 InputStream stderr = null;
         	 InputStream stdout = null;
-        	 
         	 String command = "python C:\\Users\\User\\Desktop\\traffic-generator\\TerminateDDOS.py";
         	 Runtime r = Runtime.getRuntime();
         	 Process proc = r.exec(command);
@@ -338,13 +330,13 @@ public class TrafficGene extends JFrame implements ActionListener {
           try 
           {
 
-            /* { “Target(s)”:  [“192.168.120.21”, “192.168.120.50”], 
-                 “Port(s)”:  [21, 22],
-                 “Transmission”:  “UDP”, 
-                 “BufferSize”: “50KB”, 
-                 “DOS”: “Distributed”, 
-                 “Bots”: {“192.168.120.44”: [“root”, “toor”], “192.168.120.100”: [“user_100”, “mypass”]},
-                 “Localhost?”: “Yes” }  */
+            /* { Â“Target(s)Â”:  [Â“192.168.120.21Â”, Â“192.168.120.50Â”], 
+                 Â“Port(s)Â”:  [21, 22],
+                 Â“TransmissionÂ”:  Â“UDPÂ”, 
+                 Â“BufferSizeÂ”: Â“50KBÂ”, 
+                 Â“DOSÂ”: Â“DistributedÂ”, 
+                 Â“BotsÂ”: {Â“192.168.120.44Â”: [Â“rootÂ”, Â“toorÂ”], Â“192.168.120.100Â”: [Â“user_100Â”, Â“mypassÂ”]},
+                 Â“Localhost?Â”: Â“YesÂ” }  */
 
             ttype = "\"Transmission\": " + "\"" + selectedtr + "\"";
            // for(int i =0; i <=5; i++) {}
@@ -408,9 +400,8 @@ public class TrafficGene extends JFrame implements ActionListener {
             //System.out.println(bot);
             //System.out.println("Count is "+count);
          }
-            ////////
-
-            lc= "\"Localhost?\": " + lch; 
+     
+            lc= "\"Localhost?\": " + "\"" + lch+ "\""; 
 
             inputs.append("{"+ ttype+ ", " + prtnm + ", " + bsize + ", "+ trgts + ", "+ dos_ +", "+ lc + "}");
             info = inputs.toString();
